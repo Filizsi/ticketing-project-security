@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.ArrayList;
@@ -20,16 +21,15 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-
     private final SecurityService securityService;
-    private final AuthSuccessHandler authSuccessHandler;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    public SecurityConfig(SecurityService securityService, AuthSuccessHandler authSuccessHandler) {
+    public SecurityConfig(SecurityService securityService, AuthenticationSuccessHandler authenticationSuccessHandler) {
         this.securityService = securityService;
-        this.authSuccessHandler = authSuccessHandler;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
     }
 
-//    @Bean
+    //    @Bean
 //    public UserDetailsService userDetailsService(PasswordEncoder encoder){
 //
 //
@@ -51,57 +51,40 @@ public class SecurityConfig {
                 .authorizeRequests()
 //                .antMatchers("/user/**").hasRole("Admin")
                 .antMatchers("/user/**").hasAuthority("Admin")
-                .antMatchers("/project/**").hasAuthority("Manager")
-                .antMatchers("/task/employee/**").hasAuthority("Employee")
-                .antMatchers("/task/**").hasAuthority("Manager")
+                .antMatchers("/project/**").hasAnyAuthority("Manager")
+                .antMatchers("/task/employee/**").hasAnyAuthority("Employee")
+                .antMatchers("/task/**").hasRole("Manager")
 //                .antMatchers("/task/**").hasAnyRole("EMPLOYEE","ADMIN")
 //                .antMatchers("task/**").hasAuthority("ROLE_EMPLOYEE")
 
                 .antMatchers(
-                       "/",
-                       "/login",
-                       "fragments/**",
-                       "/assets/**",
-                       "/images/**"
+                        "/",
+                        "/login",
+                        "/fragments/**",
+                        "/assets/**",
+                        "/images/**"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
 //                .httpBasic()
                 .formLogin()
-                    .loginPage("/login")
-//                    .defaultSuccessUrl("/welcome")
-                    .successHandler(authSuccessHandler)
-                    .failureUrl("/login?error=true")
-                    .permitAll()
+                .loginPage("/login")
+//                .defaultSuccessUrl("/welcome")
+                .successHandler(authenticationSuccessHandler)
+                .failureUrl("/login?error=true")
+                .permitAll()
                 .and()
                 .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessUrl("/login")
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/login")
                 .and()
                 .rememberMe()
-                    .tokenValiditySeconds(120)
-                    .key("cydeo")
-                    .userDetailsService(securityService)
+                .tokenValiditySeconds(120)
+                .key("cydeo")
+                .userDetailsService(securityService)
                 .and().build();
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

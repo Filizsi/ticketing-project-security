@@ -1,5 +1,6 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.config.SecurityConfig;
 import com.cydeo.dto.ProjectDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Project;
@@ -101,11 +102,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDTO> listAllProjectDetails() {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserDTO currentUserDTO = userService.findByUserName(username);
-
         User user = userMapper.convertToEntity(currentUserDTO);
 
         List<Project> list = projectRepository.findAllByAssignedManager(user);

@@ -111,11 +111,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDTO> listAllTasksByStatusIsNot(Status status) {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
         User loggedInUser = userRepository.findByUserName(username);
-
         List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(status, loggedInUser);
         return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
     }
@@ -134,9 +131,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDTO> listAllTasksByStatus(Status status) {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
         User loggedInUser = userRepository.findByUserName(username);
         List<Task> list = taskRepository.findAllByTaskStatusAndAssignedEmployee(status, loggedInUser);
         return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
